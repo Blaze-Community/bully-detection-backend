@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>Flask Page</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+    </head>
+    <body>
+        <h1 class="text-center">Emotion Classifier</h1>
+
+        <form class="p-3 text-center" action="/predict", method="POST" enctype="multipart/form-data">
+            <input class="form-control" type="file" name="audiofile">
+            <input class="btn btn-primary mt-3" type="submit" value="Predict Audio">
+            <br><br><br>
+            {% if pred != "no file found" %}
+            <p class="text-center">Audio is a {{pred}}</p>
+            {% else %}
+            <p class = "text-center">Audio file not found</p>
+            {% endif %}
+
+        </form>
+    </body>
+</html>

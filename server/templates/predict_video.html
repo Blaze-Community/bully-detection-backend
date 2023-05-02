@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Predict Video</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    </head>
+    <body>
+        <h1 class="text-center mt-4">Video Classifier</h1>
+        <div class="col">
+          <div class="row justify-content-center">
+            <video controls autoplay style="height: 300px; width: 600px;"></video>
+          </div>
+          <div class="row justify-content-center">
+          <form class="p-3 col-4 text-center" action="/predict-video", method="POST" enctype="multipart/form-data">
+              <input id = "video_selector" class="form-control" type="file" name="video_file" accept="video/*">
+              <div class="row justify-content-center mt-4">
+                  <p id="action-pre" class="text-center">Action Predicted : </p>
+                  <p id="conf-pre" class="text-center">Confidence : </p>                
+                  <div id = "loader"class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+              </div>
+              <input id = "submit-button" class="btn btn-primary mt-3" type="submit" value="Predict Video">
+          </form>
+          </div>
+        </div>
+    </body>
+
+<script>
+
+    window.addEventListener("load", () => {
+      localFileVideoPlayer()
+      preventRefersh()
+      loaderVisibility(false)
+    });
+
+
+    function loaderVisibility(val){
+      document.getElementById("loader").style.display = (val == true) ? "block" : "none";
+    }
+
+    function preventRefersh(){
+      var form = document.querySelector('form');
+      form.addEventListener('submit', function(event) {
+            event.preventDefault();    // prevent page from refreshing
+            const formData = new FormData(form);  // grab the data inside the form fields
+            const filename = formData.get("video_file")["name"];
+            if(filename == ""){
+              return;
+            }
+
+            loaderVisibility(true);
+
+            fetch('/predict-video', {   // assuming the backend is hosted on the same server
+                method: 'POST',
+                body: formData,
+            })
+            .then(function(response) {
+                return response.json();
+              })
+            .then(function(data) {
+                loaderVisibility(false);
+                var actionPre = document.getElementById("action-pre");
+                var confPre = document.getElementById("conf-pre");
+                actionPre.innerHTML = "Action Predicted : " + data["result"][0]["action_predicted"];
+                confPre.innerHTML =  "Confidence : " +  data["result"][0]["confidence"]
+
+              })
+        });
+    }
+
+    function localFileVideoPlayer() {
+    'use strict'
+    var URL = window.URL || window.webkitURL
+    var playSelectedFile = function (event) {
+      var file = this.files[0]
+      if(file == null){
+        return
+      }
+      var type = file.type
+      var videoNode = document.querySelector('video')
+
+      var fileURL = URL.createObjectURL(file)
+      videoNode.src = fileURL
+      var actionPre = document.getElementById("action-pre");
+      var confPre = document.getElementById("conf-pre");
+      actionPre.innerHTML = "Action Predicted : ";
+      confPre.innerHTML =  "Confidence : ";
+    }
+    var inputNode = document.getElementById("video_selector");
+    inputNode.addEventListener('change', playSelectedFile, false)
+  }
+</script>
+
+</html>
