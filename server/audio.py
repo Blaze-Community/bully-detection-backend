@@ -1,7 +1,6 @@
 import librosa
 import os
 import tensorflow as tf
-from tensorflow.keras.utils import to_categorical
 import numpy as np
 
 target_labels = [ "non-violence","violence", "unsure" ]
